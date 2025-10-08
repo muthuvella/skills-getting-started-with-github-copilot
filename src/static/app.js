@@ -120,25 +120,8 @@ document.addEventListener("DOMContentLoaded", () => {
       messageDiv.classList.remove("hidden");
 
       // Hide message after 5 seconds
-    const activity = decodeURIComponent(btn.dataset.activity);
-    const email = decodeURIComponent(btn.dataset.email);
-
-    // Basic sanitization to prevent XSS in confirm dialog
-    function sanitize(str) {
-      return String(str).replace(/[<>&"'`]/g, c => ({
-        '<': '&lt;',
-        '>': '&gt;',
-        '&': '&amp;',
-        '"': '&quot;',
-        "'": '&#39;',
-        '`': '&#96;'
-      }[c]));
-    }
-
-    const safeActivity = sanitize(activity);
-    const safeEmail = sanitize(email);
-
-    if (!confirm(`Unregister ${safeEmail} from ${safeActivity}?`)) return;
+      setTimeout(() => messageDiv.classList.add("hidden"), 5000);
+    } catch (error) {
       messageDiv.textContent = "Failed to sign up. Please try again.";
       messageDiv.className = "error";
       messageDiv.classList.remove("hidden");
