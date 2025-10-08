@@ -15,6 +15,22 @@ document.addEventListener("DOMContentLoaded", () => {
       // Reset activity select before repopulating to avoid duplicate options
       activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
 
+      // Helper function to escape HTML special characters
+      function escapeHTML(str) {
+        return str.replace(/[&<>"'`=\/]/g, function (s) {
+          return ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+            '`': '&#96;',
+            '=': '&#61;',
+            '/': '&#47;'
+          })[s];
+        });
+      }
+
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
         const activityCard = document.createElement("div");
@@ -33,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 ${details.participants
                   .map(
                     (email) =>
-                      `<li class="participant-item"><span class="participant-email">${email}</span> <button class="unregister-btn" data-activity="${encodeURIComponent(
+                      `<li class="participant-item"><span class="participant-email">${escapeHTML(email)}</span> <button class="unregister-btn" data-activity="${encodeURIComponent(
                         name
                       )}" data-email="${encodeURIComponent(email)}" title="Unregister">✖</button></li>`
                   )
@@ -104,10 +120,25 @@ document.addEventListener("DOMContentLoaded", () => {
       messageDiv.classList.remove("hidden");
 
       // Hide message after 5 seconds
-      setTimeout(() => {
-        messageDiv.classList.add("hidden");
-      }, 5000);
-    } catch (error) {
+    const activity = decodeURIComponent(btn.dataset.activity);
+    const email = decodeURIComponent(btn.dataset.email);
+
+    // Basic sanitization to prevent XSS in confirm dialog
+    function sanitize(str) {
+      return String(str).replace(/[<>&"'`]/g, c => ({
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+        '"': '&quot;',
+        "'": '&#39;',
+        '`': '&#96;'
+      }[c]));
+    }
+
+    const safeActivity = sanitize(activity);
+    const safeEmail = sanitize(email);
+
+    if (!confirm(`Unregister ${safeEmail} from ${safeActivity}?`)) return;
       messageDiv.textContent = "Failed to sign up. Please try again.";
       messageDiv.className = "error";
       messageDiv.classList.remove("hidden");

@@ -8,10 +8,10 @@ SRC = os.path.join(ROOT, "src")
 if SRC not in sys.path:
     sys.path.insert(0, SRC)
 
-import app as myapp
+import app as main_app
 
 
-client = TestClient(myapp.app)
+client = TestClient(main_app.app)
 
 
 def test_get_activities():
@@ -23,16 +23,12 @@ def test_get_activities():
     assert "Chess Club" in data
 
 
+import uuid
+
 def test_signup_and_unregister_flow():
     activity = "Chess Club"
-    email = "test.student@mergington.edu"
-
-    # Ensure not already present
-    resp = client.get("/activities")
-    participants = resp.json()[activity]["participants"]
-    if email in participants:
-        # remove so test can run cleanly
-        client.delete(f"/activities/{activity}/unregister?email={email}")
+    # Use a unique email for each test run to avoid state dependency
+    email = f"test_{uuid.uuid4().hex}@mergington.edu"
 
     # Sign up
     resp = client.post(f"/activities/{activity}/signup?email={email}")

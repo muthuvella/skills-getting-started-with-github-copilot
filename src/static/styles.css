@@ -157,6 +157,7 @@ footer {
 }
 
 .participants-list {
+  /* Removed left margin to align list flush with container for better visual consistency */
   margin: 8px 0 0 0;
   padding-left: 0;
   color: #3949ab;
